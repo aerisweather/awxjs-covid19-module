@@ -1,5 +1,5 @@
 import MapSourceModule from '@aerisweather/javascript-sdk/dist/modules/MapSourceModule';
-import {get, formatDate, isArray, isNumber} from '@aerisweather/javascript-sdk/dist/utils';
+import {get, formatDate, isArray, isNumber, isset} from '@aerisweather/javascript-sdk/dist/utils';
 import {isLight} from '@aerisweather/javascript-sdk/dist/utils/color';
 import {hexColorLinterp} from "hex-color-linterp";
 import {csvToGeoJson} from "./csv2geojson";
@@ -65,7 +65,6 @@ const colorForValue = (type: string, val: number): string => {
 	return `#${useColor}`;
 };
 
-
 const diameterForValue = (val: number): number => {
 	let diameter = 28;
 	if (val >= 10000) {
@@ -80,7 +79,6 @@ const diameterForValue = (val: number): number => {
 
 
 class Covid19Module extends MapSourceModule {
-
 	private dataProp: string = 'Confirmed';
 
 	public get id() {
@@ -92,14 +90,12 @@ class Covid19Module extends MapSourceModule {
 	}
 
 	source(): any {
-
 		// determine the date for the data set
 		// it updates around midnight
 		const d: Date = new Date();
 		d.setDate(d.getUTCDate()-1);
 		const dateOpts: any = { year: 'numeric', month: '2-digit', day: '2-digit' };
 		const dataDate = new Intl.DateTimeFormat('en-US', dateOpts).format(d).replace(/\//g, '-');
-
 		const dataUrl = `https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/${dataDate}.csv`;
 
 		// noinspection JSUnusedGlobalSymbols
@@ -131,7 +127,6 @@ class Covid19Module extends MapSourceModule {
 			style: {
 				marker: (data: any) => {
 					const covidDataElem = parseInt(get(data, this.dataProp)) || 0;
-
 					if (covidDataElem !== 0) {
 						const circleDiameter: number = diameterForValue(covidDataElem);
 						const circleColor: string = colorForValue(this.dataProp, covidDataElem);
@@ -177,23 +172,19 @@ class Covid19Module extends MapSourceModule {
 			id: this.id,
 			title: 'COVID-19',
 			filter: true,
-			segments: [
-				{
-					id: `${this.id}-confirmed`,
-					value: 'Confirmed',
-					title: 'Confirmed Cases',
-				},
-				{
-					id: `${this.id}-deaths`,
-					value: 'Deaths',
-					title: 'Confirmed Deaths',
-				},
-				{
-					id: `${this.id}-recovered`,
-					value: 'Recovered',
-					title: 'Recovered',
-				}
-			]
+			segments: [{
+				id: `${this.id}-confirmed`,
+				value: 'Confirmed',
+				title: 'Confirmed Cases',
+			},{
+				id: `${this.id}-deaths`,
+				value: 'Deaths',
+				title: 'Confirmed Deaths',
+			},{
+				id: `${this.id}-recovered`,
+				value: 'Recovered',
+				title: 'Recovered',
+			}]
 		};
 	}
 
@@ -208,53 +199,55 @@ class Covid19Module extends MapSourceModule {
 	infopanel(): any {
 		// noinspection JSUnusedGlobalSymbols
 		return {
-			views: [
-				{
+			views: [{
 					renderer: (data: any) => {
 						if (!data) return;
 
 						const admin2 = get(data, 'Admin2');
 
-						let info = `
-                                        <div class="covid19">
-                                            <div class="awxjs__ui-row">
-                                                <div class="awxjs__ui-expand label">Last Updated:</div>
-                                                <div class="awxjs__ui-expand value">${data.Last_Update}</div>
-                                            </div>
+						let info = (`
+							<div class="covid19">
+								<div class="awxjs__ui-row">
+									<div class="awxjs__ui-expand label">Last Updated:</div>
+									<div class="awxjs__ui-expand value">${data.Last_Update}</div>
+								</div>
 
-                                            <div class="awxjs__ui-row">
-                                                <div class="awxjs__ui-expand label">Country:</div>
-                                                <div class="awxjs__ui-expand value">${data.Country_Region}</div>
-                                            </div>
+								<div class="awxjs__ui-row">
+									<div class="awxjs__ui-expand label">Country:</div>
+									<div class="awxjs__ui-expand value">${data.Country_Region}</div>
+								</div>
 
-                                            <div class="awxjs__ui-row">
-                                                <div class="awxjs__ui-expand label">State/Province:</div>
-                                                <div class="awxjs__ui-expand value">${data.Province_State}</div>
-                                            </div>
-                                            `;
+								<div class="awxjs__ui-row">
+									<div class="awxjs__ui-expand label">State/Province:</div>
+									<div class="awxjs__ui-expand value">${data.Province_State}</div>
+								</div>
+							`);
+
 						if (admin2)
-							info += `<div class="awxjs__ui-row">
-                                                <div class="awxjs__ui-expand label">County / Parish:</div>
-                                                <div class="awxjs__ui-expand value">${admin2}</div>
-                                            </div>`;
+							info += (`
+								<div class="awxjs__ui-row">
+									<div class="awxjs__ui-expand label">County / Parish:</div>
+									<div class="awxjs__ui-expand value">${admin2}</div>
+								</div>
+							`);
 
-						info += `<div class="awxjs__ui-row">
-                                                <div class="awxjs__ui-expand label">Confirmed Cases:</div>
-                                                <div class="awxjs__ui-expand value">${numberWithCommas(data.Confirmed)}</div>
-                                            </div>
+						info += (`
+								<div class="awxjs__ui-row">
+									<div class="awxjs__ui-expand label">Confirmed Cases:</div>
+									<div class="awxjs__ui-expand value">${numberWithCommas(data.Confirmed)}</div>
+								</div>
 
-                                            <div class="awxjs__ui-row">
-                                                <div class="awxjs__ui-expand label">Deaths:</div>
-                                                <div class="awxjs__ui-expand value">${numberWithCommas(data.Deaths)}</div>
-                                            </div>
+								<div class="awxjs__ui-row">
+									<div class="awxjs__ui-expand label">Deaths:</div>
+									<div class="awxjs__ui-expand value">${numberWithCommas(data.Deaths)}</div>
+								</div>
 
-                                            <div class="awxjs__ui-row">
-                                                <div class="awxjs__ui-expand label">Recovered:</div>
-                                                <div class="awxjs__ui-expand value">${numberWithCommas(data.Recovered)}</div>
-                                            </div>
-
-                                        </div>
-                                        `;
+								<div class="awxjs__ui-row">
+									<div class="awxjs__ui-expand label">Recovered:</div>
+									<div class="awxjs__ui-expand value">${numberWithCommas(data.Recovered)}</div>
+								</div>
+							</div>
+                    	`);
 						return info;
 					}
 				}
@@ -267,10 +260,10 @@ class Covid19Module extends MapSourceModule {
 		// instance.
 
 		this.app.on('layer:change:option', (e: any) => {
-			let {id, value} = e.data || {};
+			let { id, value } = e.data || {};
 			if (id === this.id) {
-				if (isArray(value)) {
-					value = value[0].filter;
+				if (isset(value.filters)) {
+					value = value.filters;
 				}
 				this.dataProp = value;
 			}
@@ -292,10 +285,9 @@ class Covid19Module extends MapSourceModule {
 		const admin2 = get(data, 'Admin2');
 		const state = data.Province_State;
 		let title = `COVID-19 ${country}`;
-		if (admin2) title += ' - ' + admin2;
+		if (admin2) title += ` - ${admin2}`;
 		if (state) {
-			title += (admin2) ? ', ' : ' - ';
-			title += state;
+			title += `${admin2 ? ', ' : ' - '}${state}`;
 		}
 		this.showInfoPanel(title, data);
 	}
