@@ -1,11 +1,11 @@
 const path = require('path');
 const webpack = require('webpack');
+const dotenv = require('dotenv');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const TerserPlugin = require('terser-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin');
-const dotenv = require('dotenv');
 
 const PACKAGE = require('./package.json');
 const MODULE_NAME = PACKAGE.moduleName || 'SampleModule';

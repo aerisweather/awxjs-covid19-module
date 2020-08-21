@@ -1,1 +1,1 @@
-export declare const csvToGeoJson: (data: string, config?: {}) => {};
+export declare const csvToGeoJson: (data?: string, config?: {}) => {};

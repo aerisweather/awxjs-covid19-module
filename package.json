@@ -1,9 +1,9 @@
 {
   "name": "awxjs-covid19-module",
   "moduleName": "Covid19Module",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "index.js",
-  "author": "Lee Huffman",
+  "author": "AerisWeather",
   "homepage": "https://www.aerisweather.com",
   "license": "MIT",
   "scripts": {
@@ -11,7 +11,6 @@
     "build:dev": "webpack",
     "build:prod": "NODE_ENV='production' webpack -p --env production",
     "build": "yarn build:js; yarn build:prod; rm dist/index.html",
-    "publish": "yarn build:js; npm publish",
     "dev-server": "NODE_ENV='development' webpack-dev-server"
   },
   "files": [

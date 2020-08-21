@@ -110,7 +110,7 @@
 
 			app.on("ready", () => {
 				// Add an instance of your module to the map application
-				app.modules.insertAt(1, new Covid19());
+				app.modules.insertAt(1, new Covid19Module());
 
 				// set initial visible layers
 				const layers = app.getPanel("layers");
